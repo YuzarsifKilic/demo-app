@@ -1,7 +1,7 @@
 package com.example.demoapp.demoapp.controller;
 
+import com.example.demoapp.demoapp.dto.model.LikeDto;
 import com.example.demoapp.demoapp.dto.request.CreateLikeRequest;
-import com.example.demoapp.demoapp.model.Like;
 import com.example.demoapp.demoapp.service.LikeService;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,12 +18,12 @@ public class LikeController {
     }
 
     @GetMapping("/getall")
-    public List<Like> getAll() {
+    public List<LikeDto> getAll() {
         return likeService.getAll();
     }
 
     @PostMapping("/save")
-    public Like save(@RequestBody CreateLikeRequest request) {
+    public LikeDto save(@RequestBody CreateLikeRequest request) {
         return likeService.saveLike(request);
     }
 

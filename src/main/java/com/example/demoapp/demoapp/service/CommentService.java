@@ -1,5 +1,7 @@
 package com.example.demoapp.demoapp.service;
 
+import com.example.demoapp.demoapp.dto.convert.CommentDtoConvert;
+import com.example.demoapp.demoapp.dto.model.CommentDto;
 import com.example.demoapp.demoapp.dto.request.CreateCommentRequest;
 import com.example.demoapp.demoapp.dto.request.UpdateCommentRequest;
 import com.example.demoapp.demoapp.exception.CommentNotFoundException;
@@ -10,6 +12,7 @@ import com.example.demoapp.demoapp.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CommentService {
@@ -17,18 +20,29 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final PostService postService;
+    private final CommentDtoConvert commentDtoConvert;
 
-    public CommentService(CommentRepository commentRepository, UserService userService, PostService postService) {
+    public CommentService(
+            CommentRepository commentRepository,
+            UserService userService,
+            PostService postService,
+            CommentDtoConvert commentDtoConvert) {
         this.commentRepository = commentRepository;
         this.userService = userService;
         this.postService = postService;
+        this.commentDtoConvert = commentDtoConvert;
     }
 
-    public List<Comment> getAll() {
-        return commentRepository.findAll();
+    public List<CommentDto> getAll() {
+
+        return commentRepository
+                .findAll()
+                .stream()
+                .map(c -> commentDtoConvert.convert(c))
+                .collect(Collectors.toList());
     }
 
-    public Comment saveComment(CreateCommentRequest request) {
+    public CommentDto saveComment(CreateCommentRequest request) {
         User user = userService.findById(request.getUserId());
         Post post = postService.getById(request.getPostId());
         Comment comment = new Comment(
@@ -36,10 +50,10 @@ public class CommentService {
                 post,
                 request.getText());
 
-        return commentRepository.save(comment);
+        return commentDtoConvert.convert(commentRepository.save(comment));
     }
 
-    public Comment updateComment(String userId, String postId, UpdateCommentRequest request) {
+    public CommentDto updateComment(String userId, String postId, UpdateCommentRequest request) {
         User user = userService.findById(userId);
         Post post = postService.getById(postId);
 
@@ -48,18 +62,19 @@ public class CommentService {
                 post,
                 request.getText());
 
-        return commentRepository.save(comment);
+        return commentDtoConvert.convert(commentRepository.save(comment));
     }
 
     public void deleteComment(String commentId) {
-        Comment comment = findById(commentId);
-        commentRepository.delete(comment);
+        commentRepository.deleteById(commentId);
     }
 
-    public Comment findById(String commentId) {
-        return commentRepository
+    public CommentDto findById(String commentId) {
+        Comment comment = commentRepository
                 .findById(commentId)
                 .orElseThrow(
                         () -> new CommentNotFoundException(commentId + " ye sahip bir comment bulunamadı"));
+
+        return commentDtoConvert.convert(comment);
     }
 }

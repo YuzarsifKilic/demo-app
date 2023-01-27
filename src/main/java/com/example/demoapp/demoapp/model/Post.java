@@ -12,9 +12,8 @@ public class Post {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDHexGenerator")
     private String id;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
     private User user;
     private String title;
     private String text;

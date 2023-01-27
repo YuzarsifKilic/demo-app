@@ -1,25 +1,24 @@
 package com.example.demoapp.demoapp.dto.convert;
 
-import com.example.demoapp.demoapp.dto.model.CommentDto;
-import com.example.demoapp.demoapp.model.Comment;
+import com.example.demoapp.demoapp.dto.model.LikeDto;
+import com.example.demoapp.demoapp.model.Like;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CommentDtoConvert {
+public class LikeDtoConvert {
 
     private final UserDtoConvert userDtoConvert;
     private final PostDtoConvert postDtoConvert;
 
-    public CommentDtoConvert(UserDtoConvert userDtoConvert, PostDtoConvert postDtoConvert) {
+    public LikeDtoConvert(UserDtoConvert userDtoConvert, PostDtoConvert postDtoConvert) {
         this.userDtoConvert = userDtoConvert;
         this.postDtoConvert = postDtoConvert;
     }
 
-    public CommentDto convert(Comment from) {
-        return new CommentDto(
+    public LikeDto convert(Like from) {
+        return new LikeDto(
                 from.getId(),
                 userDtoConvert.convert(from.getUser()),
-                postDtoConvert.convert(from.getPost()),
-                from.getText());
+                postDtoConvert.convert(from.getPost()));
     }
 }

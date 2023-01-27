@@ -1,5 +1,7 @@
 package com.example.demoapp.demoapp.service;
 
+import com.example.demoapp.demoapp.dto.convert.PostDtoConvert;
+import com.example.demoapp.demoapp.dto.model.PostDto;
 import com.example.demoapp.demoapp.dto.request.CreatePostRequest;
 import com.example.demoapp.demoapp.dto.request.UpdatePostRequest;
 import com.example.demoapp.demoapp.exception.PostNotfoundException;
@@ -17,34 +19,50 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserService userService;
+    private final PostDtoConvert postDtoConvert;
 
-    public PostService(PostRepository postRepository, UserService userService) {
+    public PostService(PostRepository postRepository, UserService userService, PostDtoConvert postDtoConvert) {
         this.postRepository = postRepository;
         this.userService = userService;
+        this.postDtoConvert = postDtoConvert;
     }
 
-    public List<Post> getAll() {
-        return postRepository.findAll();
+    public List<PostDto> getAll() {
+
+        return postRepository
+                .findAll()
+                .stream()
+                .map(p -> postDtoConvert.convert(p))
+                .collect(Collectors.toList());
     }
 
-    public Post save(CreatePostRequest request) {
+    public PostDto save(CreatePostRequest request) {
         User user = userService.findById(request.getId());
         Post post = new Post(
                 user,
                 request.getTitle(),
                 request.getText());
 
-        return postRepository.save(post);
+        return postDtoConvert.convert(postRepository.save(post));
     }
 
-    public Post getById(String id) {
+    protected Post getById(String id) {
         return postRepository
                 .findById(id)
                 .orElseThrow(
                         () -> new PostNotfoundException(id + " ye sahip bir post buluınamadı"));
     }
 
-    public Post update(String postId, UpdatePostRequest request) {
+    public PostDto getPost(String id) {
+        Post post = postRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new PostNotfoundException(id + " ye sahip bir post buluınamadı"));
+
+        return postDtoConvert.convert(post);
+    }
+
+    public PostDto update(String postId, UpdatePostRequest request) {
         Post post = getById(postId);
         Post updatedPost = new Post(
                 post.getId(),
@@ -52,13 +70,13 @@ public class PostService {
                 request.getTitle(),
                 request.getText());
 
-        return postRepository.save(updatedPost);
+        return postDtoConvert.convert(postRepository.save(updatedPost));
     }
 
-    public List<Post> getByUserId(String userId) {
+    public List<PostDto> getByUserId(String userId) {
         return getAll()
                 .stream()
-                .filter(p -> Objects.equals(p.getUser().getId(), userId))
+                .filter(p -> Objects.equals(p.getUserDto().getId(), userId))
                 .collect(Collectors.toList());
     }
 }

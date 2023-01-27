@@ -1,8 +1,8 @@
 package com.example.demoapp.demoapp.controller;
 
+import com.example.demoapp.demoapp.dto.model.UserDto;
 import com.example.demoapp.demoapp.dto.request.CreateUserRequest;
 import com.example.demoapp.demoapp.dto.request.UpdateUserRequest;
-import com.example.demoapp.demoapp.model.User;
 import com.example.demoapp.demoapp.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,22 +19,22 @@ public class UserController {
     }
 
     @GetMapping("/getall")
-    public List<User> getAll() {
+    public List<UserDto> getAll() {
         return userService.getAll();
     }
 
     @PostMapping("/save")
-    public User saveUser(@RequestBody CreateUserRequest request) {
+    public UserDto saveUser(@RequestBody CreateUserRequest request) {
         return userService.save(request);
     }
 
     @GetMapping("/{id}")
-    public User findById(@PathVariable String id) {
-        return userService.findById(id);
+    public UserDto findById(@PathVariable String id) {
+        return userService.getUser(id);
     }
 
     @PutMapping("/{userId}")
-    public User updateUser(@PathVariable String userId, UpdateUserRequest request) {
+    public UserDto updateUser(@PathVariable String userId, UpdateUserRequest request) {
         return userService.updateUser(userId, request);
     }
 
